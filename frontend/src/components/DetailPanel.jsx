@@ -1,3 +1,5 @@
+import ChecklistCard from './ChecklistCard';
+
 const AVATAR_COLORS = [
   { bg: 'bg-[#d4edda]', text: 'text-[#1a5c2a]' },
   { bg: 'bg-[#dce8f7]', text: 'text-[#1a3a6b]' },
@@ -238,7 +240,7 @@ export default function DetailPanel({ client, proposals, invoices, activities, l
           <ProposalsCard proposals={proposals} loading={loading} />
           <InvoicesCard invoices={invoices} loading={loading} />
         </div>
-        <ActivityCard activities={activities} loading={loading} />
+        <ChecklistCard clientId={client.id} clientName={client.name} />
       </div>
     </div>
   );

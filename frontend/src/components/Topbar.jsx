@@ -1,14 +1,21 @@
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const NAV_ITEMS = [
+  { label: 'Dashboard', path: '/dashboard' },
   { label: 'Clients', path: '/admin' },
   { label: 'Proposals', path: '/admin/proposals' },
   { label: 'Invoices', path: '/admin/invoices' },
   { label: 'Files', path: '/admin/files' },
 ];
 
-export default function Topbar({ activePage, onNewClient, onMenuOpen, onBack }) {
+function isActive(itemPath, pathname) {
+  return pathname === itemPath;
+}
+
+export default function Topbar({ onNewClient, onMenuOpen, onBack }) {
   const { user, logout } = useAuth();
+  const { pathname } = useLocation();
 
   const initials = user?.displayName
     ? user.displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -44,13 +51,13 @@ export default function Topbar({ activePage, onNewClient, onMenuOpen, onBack }) 
       </span>
 
       {/* Nav pills — hidden on mobile */}
-      <nav className="hidden md:flex items-center gap-1 flex-1">
+      <nav className="hidden md:flex items-center gap-1 flex-1 overflow-x-auto">
         {NAV_ITEMS.map(item => (
           <button
             key={item.label}
             onClick={() => window.location.href = item.path}
-            className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
-              activePage === item.label
+            className={`shrink-0 px-3 py-1.5 rounded-md text-sm transition-colors ${
+              isActive(item.path, pathname)
                 ? 'bg-[#1a2a1a] text-white'
                 : 'text-[#4a5a4a] hover:bg-[#f0f7f0]'
             }`}
@@ -90,13 +97,13 @@ export default function Topbar({ activePage, onNewClient, onMenuOpen, onBack }) 
     </header>
 
     {/* Mobile bottom navigation */}
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#eceee6] flex z-50">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#eceee6] flex overflow-x-auto z-50">
       {NAV_ITEMS.map(item => (
         <a
           key={item.label}
           href={item.path}
-          className={`flex-1 py-3 text-center text-xs font-medium transition-colors ${
-            activePage === item.label
+          className={`shrink-0 min-w-[4.5rem] py-3 text-center text-xs font-medium transition-colors ${
+            isActive(item.path, pathname)
               ? 'text-[#2d7a2d] border-t-2 border-[#2d7a2d]'
               : 'text-[#7a8a7a]'
           }`}

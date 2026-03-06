@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import LoginPage from './pages/admin/LoginPage';
+import DashboardPage from './pages/admin/DashboardPage';
 import ClientsPage from './pages/admin/ClientsPage';
 import ProposalsPage from './pages/admin/ProposalsPage';
 import InvoicesPage from './pages/admin/InvoicesPage';
@@ -22,7 +23,7 @@ function PrivateRoute({ children, requireRole }) {
 
   if (requireRole && role !== requireRole) {
     if (role === 'client') return <Navigate to="/portal" replace />;
-    if (role === 'admin') return <Navigate to="/admin" replace />;
+    if (role === 'admin') return <Navigate to="/dashboard" replace />;
     return <Navigate to="/login" replace />;
   }
 
@@ -41,7 +42,7 @@ function RootRedirect() {
   }
 
   if (!user) return <Navigate to="/login" replace />;
-  if (role === 'admin') return <Navigate to="/admin" replace />;
+  if (role === 'admin') return <Navigate to="/dashboard" replace />;
   if (role === 'client') return <Navigate to="/portal" replace />;
   return <Navigate to="/login" replace />;
 }
@@ -52,6 +53,11 @@ export default function App() {
       <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={
+          <PrivateRoute requireRole="admin">
+            <DashboardPage />
+          </PrivateRoute>
+        } />
         <Route path="/admin" element={
           <PrivateRoute requireRole="admin">
             <ClientsPage />

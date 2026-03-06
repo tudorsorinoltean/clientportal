@@ -14,6 +14,9 @@ export default function ClientsPage() {
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [showNewClientModal, setShowNewClientModal] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showProposalModal, setShowProposalModal] = useState(false);
+  const [proposalForm, setProposalForm] = useState({ title: '', description: '', price: '' });
+  const [proposalLoading, setProposalLoading] = useState(false);
 
   // Fetch clients on mount
   useEffect(() => {
@@ -60,6 +63,26 @@ export default function ClientsPage() {
     }
   }
 
+  async function handleCreateProposal() {
+    if (!proposalForm.title || !proposalForm.price) return alert('Title and price are required.');
+    setProposalLoading(true);
+    try {
+      await api.post('/proposals', {
+        clientId: selectedClient.id,
+        title: proposalForm.title,
+        description: proposalForm.description,
+        price: parseFloat(proposalForm.price),
+        status: 'draft'
+      });
+      setShowProposalModal(false);
+      setProposalForm({ title: '', description: '', price: '' });
+    } catch (err) {
+      alert(err.response?.data?.error || 'Error creating proposal.');
+    } finally {
+      setProposalLoading(false);
+    }
+  }
+
   function handleSelectClient(client) {
     setSelectedClient(client);
     setDrawerOpen(false);
@@ -102,7 +125,7 @@ export default function ClientsPage() {
             invoices={invoices}
             activities={activities}
             loading={loadingDetail}
-            onNewProposal={() => console.log('New proposal for', selectedClient?.name)}
+            onNewProposal={() => setShowProposalModal(true)}
           />
         </div>
       </div>
@@ -116,6 +139,49 @@ export default function ClientsPage() {
             setShowNewClientModal(false);
           }}
         />
+      )}
+      {showProposalModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-[#1a2a1a] mb-4" style={{ fontFamily: 'Playfair Display, serif' }}>
+              New Proposal for {selectedClient?.name}
+            </h2>
+            <div className="space-y-3">
+              <input
+                type="text"
+                placeholder="Title *"
+                value={proposalForm.title}
+                onChange={e => setProposalForm(p => ({ ...p, title: e.target.value }))}
+                className="w-full border border-[#eceee6] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2d7a2d]"
+              />
+              <textarea
+                placeholder="Description"
+                value={proposalForm.description}
+                onChange={e => setProposalForm(p => ({ ...p, description: e.target.value }))}
+                rows={3}
+                className="w-full border border-[#eceee6] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2d7a2d] resize-none"
+              />
+              <input
+                type="number"
+                placeholder="Price (EUR) *"
+                value={proposalForm.price}
+                onChange={e => setProposalForm(p => ({ ...p, price: e.target.value }))}
+                className="w-full border border-[#eceee6] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#2d7a2d]"
+              />
+            </div>
+            <div className="flex gap-2 mt-5 justify-end">
+              <button
+                onClick={() => { setShowProposalModal(false); setProposalForm({ title: '', description: '', price: '' }); }}
+                className="px-4 py-2 text-sm border border-[#eceee6] rounded-lg text-[#4a5a4a] hover:bg-[#f7f8f5]"
+              >Cancel</button>
+              <button
+                onClick={handleCreateProposal}
+                disabled={proposalLoading}
+                className="px-4 py-2 text-sm bg-[#2d7a2d] text-white rounded-lg hover:bg-[#256425] disabled:opacity-50"
+              >{proposalLoading ? 'Creating...' : 'Create Proposal'}</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

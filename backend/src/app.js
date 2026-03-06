@@ -37,6 +37,7 @@ app.use('/api/clients', require('./routes/clients'));
 app.use('/api/proposals', require('./routes/proposals'));
 app.use('/api/invoices', require('./routes/invoices'));
 app.use('/api/files', require('./routes/files'));
+app.use('/api/projects', require('./routes/projects'));
 app.use('/api/activity', require('./routes/activity'));
 
 app.use((req, res) => {

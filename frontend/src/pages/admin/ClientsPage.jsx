@@ -91,7 +91,6 @@ export default function ClientsPage() {
   return (
     <div className="h-screen flex flex-col bg-[#f7f8f5] overflow-hidden">
       <Topbar
-        activePage="Clients"
         onNewClient={() => setShowNewClientModal(true)}
         onMenuOpen={selectedClient ? undefined : () => setDrawerOpen(true)}
         onBack={selectedClient ? () => setSelectedClient(null) : undefined}

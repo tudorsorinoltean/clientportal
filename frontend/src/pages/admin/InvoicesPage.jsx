@@ -68,7 +68,7 @@ export default function InvoicesPage() {
 
   return (
     <div className="h-screen flex flex-col bg-[#f7f8f5] overflow-hidden">
-      <Topbar activePage="Invoices" />
+      <Topbar />
 
       <div className="flex-1 overflow-y-auto p-6 pb-16 md:pb-6">
         {/* Header */}

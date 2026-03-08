@@ -40,26 +40,31 @@ export default function ChecklistCard({ clientId }) {
 
   useEffect(() => {
     if (!clientId) return;
+    let cancelled = false;
     setLoadingProjects(true);
     setProjects([]);
     setSelectedProjectId(null);
     setTasks([]);
     api.get(`/projects?clientId=${clientId}`)
       .then(res => {
+        if (cancelled) return;
         setProjects(res.data);
         if (res.data.length > 0) setSelectedProjectId(res.data[0].id);
       })
-      .catch(err => console.error('fetch projects:', err))
-      .finally(() => setLoadingProjects(false));
+      .catch(err => { if (!cancelled) console.error('fetch projects:', err); })
+      .finally(() => { if (!cancelled) setLoadingProjects(false); });
+    return () => { cancelled = true; };
   }, [clientId]);
 
   useEffect(() => {
     if (!selectedProjectId) { setTasks([]); return; }
+    let cancelled = false;
     setLoadingTasks(true);
     api.get(`/projects/${selectedProjectId}/checklist`)
-      .then(res => setTasks(res.data))
-      .catch(err => console.error('fetch checklist:', err))
-      .finally(() => setLoadingTasks(false));
+      .then(res => { if (!cancelled) setTasks(res.data); })
+      .catch(err => { if (!cancelled) console.error('fetch checklist:', err); })
+      .finally(() => { if (!cancelled) setLoadingTasks(false); });
+    return () => { cancelled = true; };
   }, [selectedProjectId]);
 
   const selectedProject = projects.find(p => p.id === selectedProjectId);

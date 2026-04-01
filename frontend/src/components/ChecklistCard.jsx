@@ -283,28 +283,26 @@ export default function ChecklistCard({ clientId }) {
                       className="w-full text-sm border border-[#eceee6] rounded-md px-3 py-1.5 text-[#1a2a1a] focus:outline-none focus:ring-1 focus:ring-[#2d7a2d]"
                       style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
                     />
-                    <div className="flex gap-2">
-                      <select
-                        value={newTaskCategory}
-                        onChange={e => setNewTaskCategory(e.target.value)}
-                        className="flex-1 text-sm border border-[#eceee6] rounded-md px-2 py-1.5 text-[#1a2a1a] bg-white focus:outline-none focus:ring-1 focus:ring-[#2d7a2d]"
-                        style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
-                      >
-                        {CATEGORY_ORDER.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
-                      <label
-                        className="flex items-center gap-1.5 text-xs text-[#4a5a4a] cursor-pointer select-none"
-                        style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={newTaskVisible}
-                          onChange={e => setNewTaskVisible(e.target.checked)}
-                          className="accent-[#2d7a2d]"
-                        />
-                        Visible to client
-                      </label>
-                    </div>
+                    <select
+                      value={newTaskCategory}
+                      onChange={e => setNewTaskCategory(e.target.value)}
+                      className="w-full text-sm border border-[#eceee6] rounded-md px-3 py-1.5 text-[#1a2a1a] bg-white focus:outline-none focus:ring-1 focus:ring-[#2d7a2d]"
+                      style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+                    >
+                      {CATEGORY_ORDER.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <label
+                      className="flex items-center gap-1.5 text-xs text-[#4a5a4a] cursor-pointer select-none"
+                      style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={newTaskVisible}
+                        onChange={e => setNewTaskVisible(e.target.checked)}
+                        className="accent-[#2d7a2d]"
+                      />
+                      Visible to client
+                    </label>
                     <div className="flex gap-2">
                       <button
                         type="submit"

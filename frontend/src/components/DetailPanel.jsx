@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import api from '../lib/api';
 import ChecklistCard from './ChecklistCard';
 
 const AVATAR_COLORS = [
@@ -120,6 +122,91 @@ function InvoicesCard({ invoices = [], loading }) {
   );
 }
 
+function ProjectsProgressCard({ clientId }) {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!clientId) return;
+    let cancelled = false;
+    setLoading(true);
+    api.get(`/projects?clientId=${clientId}`)
+      .then(res => { if (!cancelled) setProjects(res.data); })
+      .catch(err => { if (!cancelled) console.error('fetch projects progress:', err); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [clientId]);
+
+  function barColor(pct) {
+    if (pct > 75) return 'bg-[#2d7a2d]';
+    if (pct >= 25) return 'bg-[#f0b429]';
+    return 'bg-[#c0392b]';
+  }
+
+  function labelColor(pct) {
+    if (pct > 75) return 'text-[#2d7a2d]';
+    if (pct >= 25) return 'text-[#b07a00]';
+    return 'text-[#c0392b]';
+  }
+
+  return (
+    <div className="bg-white border border-[#eceee6] rounded-lg p-4">
+      <h3
+        className="text-sm font-semibold text-[#1a2a1a] mb-3"
+        style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+      >
+        Projects
+      </h3>
+      {loading ? (
+        <div className="space-y-3 animate-pulse">
+          {[...Array(2)].map((_, i) => (
+            <div key={i} className="space-y-1.5">
+              <div className="h-3 bg-[#f7f8f5] rounded w-2/3" />
+              <div className="h-2 bg-[#f0f0ea] rounded-full w-full" />
+            </div>
+          ))}
+        </div>
+      ) : projects.length === 0 ? (
+        <p className="text-sm text-[#7a8a7a]" style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}>
+          No projects yet.
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {projects.map(p => {
+            const pct = p.progress?.percentage ?? 0;
+            const completed = p.progress?.completed ?? 0;
+            const total = p.progress?.total ?? 0;
+            return (
+              <div key={p.id}>
+                <div className="flex items-center justify-between mb-1">
+                  <span
+                    className="text-sm text-[#1a2a1a] truncate mr-2"
+                    style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+                  >
+                    {p.name}
+                  </span>
+                  <span
+                    className={`text-xs font-medium shrink-0 ${labelColor(pct)}`}
+                    style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+                  >
+                    {completed}/{total} · {pct}%
+                  </span>
+                </div>
+                <div className="w-full bg-[#f0f0ea] rounded-full h-1.5">
+                  <div
+                    className={`h-1.5 rounded-full transition-all duration-300 ${barColor(pct)}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ActivityCard({ activities = [], loading }) {
   const typeLabels = {
     client_created: '👤 Client created',
@@ -177,7 +264,7 @@ function ActivityCard({ activities = [], loading }) {
 export default function DetailPanel({ client, proposals, invoices, activities, loading, onNewProposal }) {
   if (!client) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#f7f8f5]">
+      <div className="h-full flex items-center justify-center bg-[#f7f8f5]">
         <div className="text-center">
           <p
             className="text-[#7a8a7a] text-sm"
@@ -194,7 +281,7 @@ export default function DetailPanel({ client, proposals, invoices, activities, l
   const initials = getInitials(client.name);
 
   return (
-    <div className="flex-1 flex flex-col bg-[#f7f8f5] overflow-hidden">
+    <div className="h-full flex flex-col bg-[#f7f8f5] overflow-hidden">
       {/* Client header */}
       <div className="bg-white border-b border-[#eceee6] px-4 md:px-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4">
         <div className="flex items-center gap-4">
@@ -239,6 +326,9 @@ export default function DetailPanel({ client, proposals, invoices, activities, l
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <ProposalsCard proposals={proposals} loading={loading} />
           <InvoicesCard invoices={invoices} loading={loading} />
+        </div>
+        <div className="mb-4">
+          <ProjectsProgressCard clientId={client.id} />
         </div>
         <ChecklistCard clientId={client.id} clientName={client.name} />
       </div>

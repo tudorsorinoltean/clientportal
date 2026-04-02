@@ -29,7 +29,9 @@ export function useAuth() {
   }, []);
 
   const login = async (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password);
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    await result.user.getIdToken(true);
+    return result;
   };
 
   const logout = async () => {

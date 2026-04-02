@@ -210,12 +210,14 @@ export default function ChecklistCard({ clientId }) {
                         e.stopPropagation();
                         if (!window.confirm(`Delete project "${p.name}" and all its tasks?`)) return;
                         api.delete(`/projects/${p.id}`).then(() => {
-                          const remaining = projects.filter(x => x.id !== p.id);
-                          setProjects(remaining);
-                          if (selectedProjectId === p.id) {
-                            setSelectedProjectId(remaining.length > 0 ? remaining[0].id : null);
-                            setTasks([]);
-                          }
+                          setProjects(prev => {
+                            const remaining = prev.filter(x => x.id !== p.id);
+                            if (selectedProjectId === p.id) {
+                              setSelectedProjectId(remaining.length > 0 ? remaining[0].id : null);
+                              setTasks([]);
+                            }
+                            return remaining;
+                          });
                         }).catch(err => console.error('delete project:', err));
                       }}
                       className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c0392b] hover:text-[#922b21] shrink-0 ml-2"

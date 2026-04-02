@@ -13,7 +13,9 @@ export function useAuth() {
       if (firebaseUser) {
         const tokenResult = await firebaseUser.getIdTokenResult();
         setUser(firebaseUser);
-        setRole(tokenResult.claims.role || null);
+        const claims = tokenResult.claims;
+        const resolvedRole = claims.admin === true ? 'admin' : (claims.role || null);
+        setRole(resolvedRole);
         setClientId(tokenResult.claims.clientId || null);
       } else {
         setUser(null);

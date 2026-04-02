@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../lib/api';
+import { useAuth } from '../hooks/useAuth';
 
 const CATEGORY_ORDER = ['Proposal', 'Finance', 'Project', 'Delivery', 'Post-project'];
 
@@ -21,6 +22,8 @@ function LoadingSkeleton() {
 }
 
 export default function ChecklistCard({ clientId }) {
+  const { role } = useAuth();
+  const isAdmin = role === 'admin';
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [tasks, setTasks] = useState([]);
@@ -128,6 +131,30 @@ export default function ChecklistCard({ clientId }) {
     }
   }
 
+  async function handleDeleteTask(task) {
+    if (!task.isCustom) return;
+    try {
+      await api.delete(`/projects/${selectedProjectId}/checklist/${task.id}`);
+      setTasks(prev => prev.filter(t => t.id !== task.id));
+    } catch (err) {
+      console.error('delete task:', err);
+    }
+  }
+
+  async function handleDeleteProject() {
+    if (!selectedProject) return;
+    if (!window.confirm(`Delete project "${selectedProject.name}" and all its tasks?`)) return;
+    try {
+      await api.delete(`/projects/${selectedProjectId}`);
+      const remaining = projects.filter(p => p.id !== selectedProjectId);
+      setProjects(remaining);
+      setSelectedProjectId(remaining.length > 0 ? remaining[0].id : null);
+      setTasks([]);
+    } catch (err) {
+      console.error('delete project:', err);
+    }
+  }
+
   const grouped = CATEGORY_ORDER.reduce((acc, cat) => {
     const catTasks = tasks.filter(t => t.category === cat);
     if (catTasks.length > 0) acc[cat] = catTasks;
@@ -147,13 +174,24 @@ export default function ChecklistCard({ clientId }) {
           >
             Project Checklist
           </h3>
-          <button
-            onClick={() => setShowNewProjectModal(true)}
-            className="text-xs px-2.5 py-1 bg-[#f0f7f0] text-[#2d7a2d] rounded-md hover:bg-[#e0f0e0] transition-colors font-medium"
-            style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
-          >
-            + New Project
-          </button>
+          <div className="flex items-center gap-2">
+            {isAdmin && selectedProjectId && (
+              <button
+                onClick={handleDeleteProject}
+                className="text-xs px-2.5 py-1 bg-[#fde8e8] text-[#c0392b] rounded-md hover:bg-[#fcd0d0] transition-colors font-medium"
+                style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+              >
+                Delete Project
+              </button>
+            )}
+            <button
+              onClick={() => setShowNewProjectModal(true)}
+              className="text-xs px-2.5 py-1 bg-[#f0f7f0] text-[#2d7a2d] rounded-md hover:bg-[#e0f0e0] transition-colors font-medium"
+              style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+            >
+              + New Project
+            </button>
+          </div>
         </div>
 
         {loadingProjects ? (
@@ -261,6 +299,17 @@ export default function ChecklistCard({ clientId }) {
                           <span
                             className={`w-2 h-2 rounded-full shrink-0 ${STATUS_DOT[task.status] || STATUS_DOT.pending}`}
                           />
+                          {isAdmin && task.isCustom && (
+                            <button
+                              onClick={() => handleDeleteTask(task)}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-[#c0392b] hover:text-[#922b21] shrink-0"
+                              title="Delete task"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>

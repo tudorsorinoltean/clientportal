@@ -11,6 +11,19 @@ ClientPortal is a full-stack freelancer client management platform built with Re
 
 ---
 
+## 🔐 Demo Access
+
+ClientPortal has two separate roles — try both to see the full experience:
+
+| Role | URL | Email | Password |
+|------|-----|-------|----------|
+| **Admin** (freelancer view) | [clientportal-dev-30c37.web.app](https://clientportal-dev-30c37.web.app) | `demo.admin@clientportal.app` | `Demo1234!` |
+| **Client** (Bogdan Ionescu) | [clientportal-dev-30c37.web.app](https://clientportal-dev-30c37.web.app) | `demo.client@clientportal.app` | `Demo1234!` |
+
+The admin sees all clients, proposals, invoices and files. The client sees only their own data — filtered by role from the Firebase token.
+
+---
+
 ## Screenshots
 
 | | |

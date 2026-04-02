@@ -114,6 +114,51 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </div>
+
+        {/* Demo — Admin */}
+        <div className="mt-4 bg-slate-50 border border-slate-200 rounded-xl p-4">
+          <p
+            className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2"
+            style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+          >
+            Demo — Admin Access
+          </p>
+          <div className="text-xs text-slate-600 space-y-0.5 mb-3" style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}>
+            <p><span className="font-medium">Email:</span> demo.admin@clientportal.app</p>
+            <p><span className="font-medium">Password:</span> Demo1234!</p>
+            <p><span className="font-medium">Role:</span> Full admin access</p>
+          </div>
+          <button
+            onClick={() => { setEmail('demo.admin@clientportal.app'); setPassword('Demo1234!'); }}
+            className="text-xs px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-md transition-colors"
+            style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+          >
+            Use demo credentials
+          </button>
+        </div>
+
+        {/* Demo — Client */}
+        <div className="mt-3 bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <p
+            className="text-xs font-semibold text-blue-500 uppercase tracking-wide mb-2"
+            style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+          >
+            Demo — Client Access
+          </p>
+          <div className="text-xs text-blue-700 space-y-0.5 mb-3" style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}>
+            <p><span className="font-medium">Email:</span> demo.client@clientportal.app</p>
+            <p><span className="font-medium">Password:</span> Demo1234!</p>
+            <p><span className="font-medium">Role:</span> Client portal view</p>
+          </div>
+          <button
+            onClick={() => { setEmail('demo.client@clientportal.app'); setPassword('Demo1234!'); }}
+            className="text-xs px-3 py-1.5 bg-blue-200 hover:bg-blue-300 text-blue-700 rounded-md transition-colors"
+            style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
+          >
+            Use demo credentials
+          </button>
+        </div>
+
       </div>
     </div>
   );

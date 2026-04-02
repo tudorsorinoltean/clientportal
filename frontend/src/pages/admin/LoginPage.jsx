@@ -10,8 +10,11 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
+  const handleLogin = async (overrideEmail, overridePassword) => {
+    const emailToUse = overrideEmail ?? email;
+    const passwordToUse = overridePassword ?? password;
+
+    if (!emailToUse || !passwordToUse) {
       setError('Please enter email and password.');
       return;
     }
@@ -20,7 +23,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      await login(email, password);
+      await login(emailToUse, passwordToUse);
       navigate('/');
     } catch (err) {
       setError('Invalid email or password.');
@@ -129,7 +132,7 @@ export default function LoginPage() {
             <p><span className="font-medium">Role:</span> Full admin access</p>
           </div>
           <button
-            onClick={() => { setEmail('demo.admin@clientportal.app'); setPassword('Demo1234!'); }}
+            onClick={() => handleLogin('demo.admin@clientportal.app', 'Demo1234!')}
             className="text-xs px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-md transition-colors"
             style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
           >
@@ -151,7 +154,7 @@ export default function LoginPage() {
             <p><span className="font-medium">Role:</span> Client portal view</p>
           </div>
           <button
-            onClick={() => { setEmail('demo.client@clientportal.app'); setPassword('Demo1234!'); }}
+            onClick={() => handleLogin('demo.client@clientportal.app', 'Demo1234!')}
             className="text-xs px-3 py-1.5 bg-blue-200 hover:bg-blue-300 text-blue-700 rounded-md transition-colors"
             style={{ fontFamily: 'IBM Plex Sans, sans-serif' }}
           >

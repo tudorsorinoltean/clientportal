@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../lib/api';
 import ChecklistCard from './ChecklistCard';
 
@@ -122,20 +122,7 @@ function InvoicesCard({ invoices = [], loading }) {
   );
 }
 
-function ProjectsProgressCard({ clientId }) {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!clientId) return;
-    let cancelled = false;
-    setLoading(true);
-    api.get(`/projects?clientId=${clientId}`)
-      .then(res => { if (!cancelled) setProjects(res.data); })
-      .catch(err => { if (!cancelled) console.error('fetch projects progress:', err); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
-  }, [clientId]);
+function ProjectsProgressCard({ projects = [], loading }) {
 
   function barColor(pct) {
     if (pct > 75) return 'bg-[#2d7a2d]';
@@ -262,6 +249,25 @@ function ActivityCard({ activities = [], loading }) {
 }
 
 export default function DetailPanel({ client, proposals, invoices, activities, loading, onNewProposal }) {
+  const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
+
+  const fetchProjects = useCallback(() => {
+    if (!client?.id) return;
+    let cancelled = false;
+    setLoadingProjects(true);
+    api.get(`/projects?clientId=${client.id}`)
+      .then(res => { if (!cancelled) setProjects(res.data); })
+      .catch(err => { if (!cancelled) console.error('fetch projects:', err); })
+      .finally(() => { if (!cancelled) setLoadingProjects(false); });
+    return () => { cancelled = true; };
+  }, [client?.id]);
+
+  useEffect(() => {
+    setProjects([]);
+    return fetchProjects();
+  }, [fetchProjects]);
+
   if (!client) {
     return (
       <div className="h-full flex items-center justify-center bg-[#f7f8f5]">
@@ -328,9 +334,15 @@ export default function DetailPanel({ client, proposals, invoices, activities, l
           <InvoicesCard invoices={invoices} loading={loading} />
         </div>
         <div className="mb-4">
-          <ProjectsProgressCard clientId={client.id} />
+          <ProjectsProgressCard projects={projects} loading={loadingProjects} />
         </div>
-        <ChecklistCard clientId={client.id} clientName={client.name} />
+        <ChecklistCard
+          clientId={client.id}
+          clientName={client.name}
+          projects={projects}
+          setProjects={setProjects}
+          loadingProjects={loadingProjects}
+        />
       </div>
     </div>
   );

@@ -21,13 +21,11 @@ function LoadingSkeleton() {
   );
 }
 
-export default function ChecklistCard({ clientId }) {
+export default function ChecklistCard({ clientId, projects = [], setProjects, loadingProjects = false }) {
   const { role } = useAuth();
   const isAdmin = role === 'admin';
-  const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [tasks, setTasks] = useState([]);
-  const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingTasks, setLoadingTasks] = useState(false);
 
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
@@ -42,21 +40,8 @@ export default function ChecklistCard({ clientId }) {
   const [savingTask, setSavingTask] = useState(false);
 
   useEffect(() => {
-    if (!clientId) return;
-    let cancelled = false;
-    setLoadingProjects(true);
-    setProjects([]);
-    setSelectedProjectId(null);
+    setSelectedProjectId(projects.length > 0 ? projects[0].id : null);
     setTasks([]);
-    api.get(`/projects?clientId=${clientId}`)
-      .then(res => {
-        if (cancelled) return;
-        setProjects(res.data);
-        if (res.data.length > 0) setSelectedProjectId(res.data[0].id);
-      })
-      .catch(err => { if (!cancelled) console.error('fetch projects:', err); })
-      .finally(() => { if (!cancelled) setLoadingProjects(false); });
-    return () => { cancelled = true; };
   }, [clientId]);
 
   useEffect(() => {
